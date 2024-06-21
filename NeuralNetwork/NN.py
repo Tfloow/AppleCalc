@@ -90,7 +90,7 @@ class NeuralNetwork:
         
         mat = np.reshape(inputs, (28,28))
         plt.imshow(mat, interpolation='nearest', cmap=plt.cm.binary)
-        plt.savefig(f"MNIST/Backtrack{np.argmax(targets_list)}")
+        plt.savefig(f"Back/Backtrack{np.argmax(targets_list)}")
         
         return inputs
     

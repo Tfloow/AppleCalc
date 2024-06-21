@@ -11,7 +11,11 @@ parser.add_argument("--Training", help="Load NPY data", action="store_true")
 parser.add_argument("--Weight", help="Use Saved weights", action="store_true")
 args = parser.parse_args()
 
-network = NN.NeuralNetwork(28*28, 200, 10, 0.3)
+print("[LOG] : Creating the Neural Network")
+
+#network = NN.NeuralNetwork(28*28, 200, 10, 0.3)
+network = NN.NeuralNetworkMultiple([28*28, 200, 10], 0.3)
+
 
 # Check if the training data is already saved
 if args.Training:

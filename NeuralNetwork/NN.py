@@ -105,7 +105,87 @@ class NeuralNetwork:
         self.who = np.loadtxt("weightOutput.csv",delimiter=",", dtype=float)
 
     
+class NeuralNetworkMultiple:
+    """
+    My neural Network
+    """
     
+    def __init__(self, layer_nodes : list[list[int]], learningrate : int):
+        # Set the number of node
+        self.nodes = layer_nodes
+        
+        # Set the learning rate
+        self.lr = learningrate
+        
+        # Weights matrices
+        self.weights = []
+        for i in range(len(layer_nodes) - 1):
+            self.weights.append(np.random.rand(self.nodes[i+1], self.nodes[i]) - 0.5)
+        """
+        Pour avoir la belle distribution des poids
+        self.wih = np.random.normal(0.0, pow(self.hnodes, -0.5), (self.hnodes, self.inodes))
+        self.who = np.random.normal(0.0, pow(self.onodes, -0.5), (self.onodes, self.hnodes))
+        """
+        self.activation_function = lambda x: expit(x)
+        self.inverse_activation_function = lambda x: logit(x)
+
+    
+    def train(self, inputs_list, targets_list):
+        # Convert into a 2d array
+        inputs = [np.array(inputs_list, ndmin=2)]
+        outputs = []
+        targets = np.array(targets_list, ndmin=2)
+        
+        for i in range(len(self.nodes) - 1):
+            inputs.append(np.dot(self.weights[i], inputs[i]))
+            outputs.append(self.activation_function(inputs[i+1]))
+        
+        errors = [outputs[-1] - targets] # First error then propagate
+        for i in range(len(self.nodes) - 1):
+            errors.append(np.dot(self.weights[len(self.nodes)-i-2].T, errors[i]))
+
+        # Update the weights
+        for i in range(1,len(self.nodes) - 1):
+            self.weights[i] += self.lr * np.dot((errors[len(self.nodes)-i-2] * outputs[len(self.nodes)-i-1] * (1.0 - outputs[len(self.nodes)-i-1])), np.transpose(outputs[len(self.nodes)-i-2]))
+
+    def query(self, inputs_list):
+        inputs = np.array(inputs_list, ndmin=2)
+        
+        for i in range(len(self.nodes) - 1):
+            inputs = np.dot(self.weights[i], inputs)
+            inputs = self.activation_function(inputs)
+        
+        return inputs
+    
+    def backquery(self, targets_list):
+        # transpose the targets list to a vertical array
+        final_outputs = np.array(targets_list, ndmin=2)
+        
+        for i in range(len(self.nodes) - 1):
+            final_inputs = self.inverse_activation_function(final_outputs)
+            final_outputs = np.dot(self.weights[len(self.nodes)-i-2].T, final_inputs)
+            final_outputs -= np.min(final_outputs)
+            final_outputs /= np.max(final_outputs)
+            final_outputs *= 0.98
+            final_outputs += 0.01
+        
+        mat = np.reshape(final_outputs, (28,28))
+        plt.imshow(mat, interpolation='nearest', cmap=plt.cm.binary)
+        plt.savefig(f"Back/Backtrack{np.argmax(targets_list)}")
+        
+        return final_outputs
+    
+    def writeWeight(self):
+        np.savetxt("weightHidden.csv", self.weights[0], delimiter=",")
+        
+        np.savetxt("weightOutput.csv", self.weights[1], delimiter=",")
+        
+    def loadWeight(self):
+        self.weights = []
+        self.weights.append(np.loadtxt("weightHidden.csv",delimiter=",", dtype=float))
+        
+        self.weights.append(np.loadtxt("weightOutput.csv",delimiter=",", dtype=float))
+
 if __name__ == "__main__":
     input_nodes = 3; hidden_nodes = 3; output_nodes = 3
     learning_rate = 0.3

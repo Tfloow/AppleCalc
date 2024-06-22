@@ -143,10 +143,11 @@ class NeuralNetworkMultiple:
         errors = [outputs[-1] - targets] # First error then propagate
         for i in range(len(self.nodes) - 1):
             errors.append(np.dot(self.weights[len(self.nodes)-i-2].T, errors[i]))
-
+                
         # Update the weights
         for i in range(1,len(self.nodes) - 1):
             self.weights[i] += self.lr * np.dot((errors[len(self.nodes)-i-2] * outputs[len(self.nodes)-i-1] * (1.0 - outputs[len(self.nodes)-i-1])), np.transpose(outputs[len(self.nodes)-i-2]))
+
 
     def query(self, inputs_list):
         inputs = np.array(inputs_list, ndmin=2)

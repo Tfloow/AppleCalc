@@ -2,23 +2,26 @@ import numpy as np
 import NN as NN
 import glob
 import matplotlib.image as mpim
+from scipy.spatial.transform import Rotation as R
+from scipy.ndimage import rotate
+import matplotlib.pyplot as plt
 # Parse command
 import argparse
 
 # Create the parser
 parser = argparse.ArgumentParser(description="Train the neural network")
-parser.add_argument("--Training", help="Load NPY data", action="store_true")
+parser.add_argument("--NPY", help="Load NPY data", action="store_true")
 parser.add_argument("--Weight", help="Use Saved weights", action="store_true")
 args = parser.parse_args()
 
 print("[LOG] : Creating the Neural Network")
 
-#network = NN.NeuralNetwork(28*28, 200, 10, 0.3)
-network = NN.NeuralNetworkMultiple([28*28, 200, 10], 0.3)
+network = NN.NeuralNetwork(28*28, 200, 10, 0.3)
+#network = NN.NeuralNetworkMultiple([28*28, 200, 10], 0.3)
 
 
 # Check if the training data is already saved
-if args.Training:
+if args.NPY:
     print("[LOG] : Loading training data")
     training_data = np.load("training_data_image.npy")
     targets = np.load("training_data_target.npy")
@@ -32,11 +35,27 @@ else:
     for number in range(10):
         for i, image_path in enumerate(glob.glob(f"mnist_png/training/{number}/*.png")):
             image = mpim.imread(image_path)
-            image = np.reshape(image, (28*28, 1))
+            #image = np.reshape(image, (28*28, 1))
             image = image / 255.0 * 0.99 + 0.01
+            original = image
             target = np.zeros((10, 1)) + 0.01
             target[number] = 0.99
+            
+            image = np.reshape(image, (28*28, 1))
             training_data.append((image, target))
+            
+            
+            # add 10 degree rotation to the matrix
+            for d in range(0,20,2):
+                image = rotate(original, d, reshape=False)
+                image = np.reshape(image, (28*28, 1))
+                training_data.append((image, target))
+                
+                # add -10 degree rotation
+                image = rotate(original, -d, reshape=False)
+                image = np.reshape(image, (28*28, 1))
+                training_data.append((image, target))
+                            
             labels.append(number)
         
         

@@ -1,1 +1,2 @@
-python-mnist
+cv2
+SciPy==1.11.4

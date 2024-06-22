@@ -3,6 +3,7 @@ import argparse
 import matplotlib.image as mpim
 from scipy.ndimage import zoom
 import matplotlib.pyplot as plt
+import cv2
 import numpy as np
 
 # Create the parser
@@ -10,6 +11,12 @@ parser = argparse.ArgumentParser(description="Upload a picture and predict the n
 parser.add_argument("--Path", help="Path to the image", required=True)
 
 args = parser.parse_args()
+
+def Gaussian_Blur(image, sigma):
+    """
+    Apply a gaussian blur to the image
+    """
+    return cv2.GaussianBlur(image, (5,5), sigma)
 
 print("[LOG] : Creating the Neural Network")
 network = NN.NeuralNetwork(28*28, 200, 10, 0.3)
@@ -63,7 +70,8 @@ if image.shape[0] != image.shape[1] :
 if image.shape[0] != 28:
     image = zoom(image, 28/image.shape[0])
     print(image.shape)
-    
+
+image = Gaussian_Blur(image, 0.5)    
 image = image / 255.0 * 0.99 + 0.01
 
 

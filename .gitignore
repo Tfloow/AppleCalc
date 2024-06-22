@@ -1,3 +1,4 @@
 Data
 mnist_png
 *.npy
+__pycache__

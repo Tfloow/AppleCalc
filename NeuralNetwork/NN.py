@@ -104,6 +104,14 @@ class NeuralNetwork:
         
         self.who = np.loadtxt("weightOutput.csv",delimiter=",", dtype=float)
 
+    def guess(self, image):
+        """Easy wrapper to just put an image and get the guess
+
+        Args:
+            image (numpy array): a 28 by 28 matrix
+        """
+        return np.argmax(self.query(np.reshape(image, (28*28, 1))))
+
     
 class NeuralNetworkMultiple:
     """
@@ -175,6 +183,14 @@ class NeuralNetworkMultiple:
         plt.savefig(f"Back/Backtrack{np.argmax(targets_list)}")
         
         return final_outputs
+    
+    def guess(self, image):
+        """Easy wrapper to just put an image and get the guess
+
+        Args:
+            image (numpy array): a 28 by 28 matrix
+        """
+        np.argmax(self.query(np.reshape(image, (28*28, 1))))
     
     def writeWeight(self):
         np.savetxt("weightHidden.csv", self.weights[0], delimiter=",")
